@@ -1783,24 +1783,9 @@ class PclZip
             return $v_result;
         }
 
-        // ----- Get 'memory_limit' configuration value
-        $v_memory_limit = ini_get('memory_limit');
-        $v_memory_limit = trim($v_memory_limit);
-        $last           = strtolower(substr($v_memory_limit, -1));
-
-        if ($last == 'g') {
-            //$v_memory_limit = $v_memory_limit*1024*1024*1024;
-            $v_memory_limit = $v_memory_limit * 1073741824;
-        }
-        if ($last == 'm') {
-            //$v_memory_limit = $v_memory_limit*1024*1024;
-            $v_memory_limit = $v_memory_limit * 1048576;
-        }
-        if ($last == 'k') {
-            $v_memory_limit = $v_memory_limit * 1024;
-        }
-
-        $p_options[PCLZIP_OPT_TEMP_FILE_THRESHOLD] = floor($v_memory_limit * PCLZIP_TEMPORARY_FILE_RATIO);
+        $p_options[PCLZIP_OPT_TEMP_FILE_THRESHOLD] = floor(
+            $this->phpConfigValueToBytes(ini_get('memory_limit')) * PCLZIP_TEMPORARY_FILE_RATIO
+        );
 
         // ----- Sanity check : No threshold if value lower than 1M
         if ($p_options[PCLZIP_OPT_TEMP_FILE_THRESHOLD] < 1048576) {
@@ -1810,6 +1795,36 @@ class PclZip
         // ----- Return
         return $v_result;
     }
+
+    /**
+     * Convert filesize value from php.ini to bytes.
+     *
+     * Convert PHP config value (2M, 8M, 200K...) to bytes. This function was taken from PHP documentation. $val is string
+     * value that need to be converted
+     *
+     * @param  string $val
+     * @return int
+     */
+    private function phpConfigValueToBytes($val)
+    {
+        $val = trim($val);
+        $last = strtolower($val{strlen($val) - 1});
+
+        if (!ctype_digit($last)) {
+            $val = substr($val, 0, strlen($val) - 1);
+        }
+
+        if ($last === 'g') {
+            $val *= 1024 * 1024 * 1024;
+        } elseif ($last === 'm') {
+            $val *= 1024 * 1024;
+        } elseif ($last === 'k') {
+            $val *= 1024;
+        }
+
+        return (int) floor((float) $val);
+    }
+
     // --------------------------------------------------------------------------------
 
     // --------------------------------------------------------------------------------

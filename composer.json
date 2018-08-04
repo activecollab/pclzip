@@ -10,6 +10,9 @@
             "name": "Vincent Blavet"
         }
     ],
+    "require": {
+        "ext-ctype": "*"
+    },
     "autoload": {
         "classmap": ["pclzip.lib.php"]
     }
