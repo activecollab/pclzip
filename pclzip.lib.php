@@ -1808,7 +1808,7 @@ class PclZip
     private function phpConfigValueToBytes($val)
     {
         $val = trim($val);
-        $last = strtolower($val{strlen($val) - 1});
+        $last = strtolower($val[strlen($val) - 1]);
 
         if (!ctype_digit($last)) {
             $val = substr($val, 0, strlen($val) - 1);
