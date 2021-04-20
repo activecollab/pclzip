@@ -2606,7 +2606,9 @@ class PclZip
                     }
 
                     // ----- Read the file content
-                    $v_content = @fread($v_file, $p_header['size']);
+                    $v_content = !empty($p_header['size'])
+                        ? @fread($v_file, $p_header['size'])
+                        : '';
 
                     // ----- Close the file
                     @fclose($v_file);
